@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-  	<groupId>com.github.chav1961</groupId>
+    <groupId>com.github.chav1961</groupId>
     <artifactId>ai</artifactId>
     <version>0.0.1</version>
   </parent>
-  <artifactId>ai.client</artifactId>
+  <artifactId>ai.gui</artifactId>
 
 	<developers>
 		<developer>
@@ -64,11 +64,16 @@
 	        <artifactId>ai.api</artifactId>
 	        <version>0.0.1</version>
 	    </dependency>
+	    <dependency>
+  			<groupId>com.github.chav1961</groupId>
+	        <artifactId>ai.client</artifactId>
+	        <version>0.0.1</version>
+	    </dependency>
 	</dependencies>
 
 
      <build>
-       <finalName>ai.client</finalName>
+       <finalName>ai.gui</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -101,7 +106,7 @@
                        <manifest>
                            <addClasspath>true</addClasspath>
                            <classpathPrefix>./</classpathPrefix>
-                            <mainClass>chav1961.ai.client.Application</mainClass>
+                            <mainClass>chav1961.ai.gui.Application</mainClass>
                        </manifest>
                    </archive>
                </configuration>
