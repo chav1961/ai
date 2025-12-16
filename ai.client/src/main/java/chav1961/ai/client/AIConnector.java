@@ -111,6 +111,11 @@ public class AIConnector {
        	}
    }
 
+	public String getServerAddress() {
+		return serverUri.toString();
+	}
+    
+    
 	private URL getServerURL(final APIAction action) throws MalformedURLException {
 		return serverUri.resolve(action.getPath()).toURL();
 	}

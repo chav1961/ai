@@ -36,8 +36,12 @@
 		</app:submenu>
 		<app:submenu name="menu.main.tools" caption="menu.main.tools" tooltip="menu.main.tools.tt">
 			<app:item name="menu.main.tools.preview" caption="menu.main.tools.preview" tooltip="menu.main.tools.preview.tt" checkable="true" action="previewProject"/>
+			<app:item name="menu.main.tools.ping" caption="menu.main.tools.ping" tooltip="menu.main.tools.ping.tt" action="ping"/>
 			<app:separator/>
 			<app:item name="menu.main.tools.settings" caption="menu.main.tools.settings" tooltip="menu.main.tools.settings.tt" action="settings"/>
+			<app:submenu name="menu.main.tools.models" caption="menu.main.tools.models" tooltip="menu.main.tools.models.tt">
+				<app:separator/>
+			</app:submenu>
 			<app:builtinSubmenu name="builtin.languages" caption="menu.main.tools.languages" tooltip="menu.main.tools.languages.tt"/>
 		</app:submenu>
 		<app:submenu name="menu.main.help" caption="menu.main.help" tooltip="menu.main.help.tt">
@@ -59,6 +63,7 @@
 		<app:key code="P" ctrl="true" action="previewProject"/>
 		<app:key code="Z" ctrl="true" action="undo"/>
 		<app:key code="Y" ctrl="true" action="redo"/>
+		<app:key code="T" ctrl="true" action="ping"/>
 	</app:keyset>
  	<app:menu id="toolbarmenu">
 		<app:item name="menu.main.edit.microphone" caption="menu.main.edit.microphone" tooltip="menu.main.edit.microphone.tt" checkable="true" icon="root://chav1961.creolenotepad.Application/chav1961/creolenotepad/microphone.png" action="microphone"/>

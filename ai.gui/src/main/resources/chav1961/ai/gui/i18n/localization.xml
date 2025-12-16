@@ -2,15 +2,19 @@
 <localization xmlns="http://www.i18n.purelib.chav1961.ru/">
 	<lang name="en">
 <!-- Application -->
-		<key name="chav1961.creolenotepad.Application.title">(c) 2023, A.V.Chernomyrdin. Simple CREOLE editor V.R.=0.0 %1$s</key>
+		<key name="chav1961.ai.gui.Application.title">(c) 2025, A.V.Chernomyrdin. AI client</key>
+		<key name="chav1961.ai.gui.Application.message.server.ok">AI server at %1$s is available, version is %2$s</key>
+		<key name="chav1961.ai.gui.Application.message.server.failed">AI server at %1$s failed (%2$s)</key>
+		
 		<key name="chav1961.creolenotepad.Application.message.ready">Ready</key>
 		<key name="chav1961.creolenotepad.Application.message.notfound">Not found</key>		
 		<key name="chav1961.creolenotepad.Application.message.replaced">%1$s items replaced</key>
 		<key name="chav1961.creolenotepad.Application.message.file.not.exists">File (%1$s) is not exists and will be removed from LRU list</key>
 		<key name="chav1961.creolenotepad.Application.message.nocssfound">Custom CSS not defined. Default will be used. Use Tools-&gt;Settings menu to define custom CSS</key>
 		<key name="chav1961.creolenotepad.Application.message.cssnotexists">Custom CSS file(%1$s) is not exists or is not accessible for you. Default will be used.</key>
-		<key name="chav1961.creolenotepad.Application.help.title">About...</key>
-		<key name="chav1961.creolenotepad.Application.help.content">uri(aboutApplication.cre)</key>
+		
+		<key name="chav1961.ai.gui.Application.help.title">About...</key>
+		<key name="chav1961.ai.gui.Application.help.content">uri(aboutApplication.cre)</key>
 
 <!-- Main menu -->
 		<key name="menu.main.file">File</key>
@@ -84,9 +88,16 @@
 		<key name="menu.main.tools">Tools</key>
 		<key name="menu.main.tools.tt">Manage the application</key>
 		<key name="menu.main.tools.preview">Preview</key>
-		<key name="menu.main.tools.preview.tt">Preview content</key>		
+		<key name="menu.main.tools.preview.tt">Preview content</key>
+		<key name="menu.main.tools.ping">Ping server</key>
+		<key name="menu.main.tools.ping.tt">Ping server connection is alive</key>
+				
 		<key name="menu.main.tools.settings">Settings</key>
 		<key name="menu.main.tools.settings.tt">Application settings</key>
+		<key name="menu.main.tools.models">Models</key>		
+		<key name="menu.main.tools.models.tt">Available models to use</key>		
+		
+		
 		<key name="menu.main.tools.languages">Language</key>
 		<key name="menu.main.tools.languages.tt">Select interface language</key>
 		<key name="menu.main.help">Help</key>
@@ -196,15 +207,18 @@
 	</lang>
 	<lang name="ru">
 <!-- Приложение -->
-		<key name="chav1961.creolenotepad.Application.title">(c) 2023, А.В.Черномырдин. Простой редактор CREOLE V.R.=0.0 %1$s</key>
+		<key name="chav1961.ai.gui.Application.title">(c) 2025, A.V.Chernomyrdin. AI client</key>
+		<key name="chav1961.ai.gui.Application.message.server.ok">ИИ сервер по адресу %1$s доступен, версия=%2$s</key>
+		<key name="chav1961.ai.gui.Application.message.server.failed">ИИ сервер по адресу %1$s недоступен (%2$s)</key>
+		
 		<key name="chav1961.creolenotepad.Application.message.ready">Готово</key>
 		<key name="chav1961.creolenotepad.Application.message.notfound">Не найдено</key>
 		<key name="chav1961.creolenotepad.Application.message.replaced">%1$s строк заменено</key>
 		<key name="chav1961.creolenotepad.Application.message.file.not.exists">Файл (%1$s) не найден и будет удален из списка последних загруженных</key>
 		<key name="chav1961.creolenotepad.Application.message.nocssfound">Пользовательская CSS не задана. Будет использована CSS по умолчанию. Задайте пользовательскую CSS через меню Инструменты-&gt;Настройки</key>
 		<key name="chav1961.creolenotepad.Application.message.cssnotexists">Пользовательская CSS (%1$s) не найдена или недсоутпна для вас. Будет использована CSS по умолчанию.</key>
-		<key name="chav1961.creolenotepad.Application.help.title">О программе</key>
-		<key name="chav1961.creolenotepad.Application.help.content">uri(aboutApplication.cre)</key>
+		<key name="chav1961.ai.gui.Application.help.title">О программе</key>
+		<key name="chav1961.ai.gui.Application.help.content">uri(aboutApplication.cre)</key>
 		
 <!-- Main menu -->
 		<key name="menu.main.file">Файл</key>
@@ -275,8 +289,12 @@
 		<key name="menu.main.tools.tt">Управление приложением</key>
 		<key name="menu.main.tools.preview">Просмотр</key>
 		<key name="menu.main.tools.preview.tt">Просмотреть текущий файл в формате *.htlp</key>		
+		<key name="menu.main.tools.ping">Проверка сервера</key>
+		<key name="menu.main.tools.ping.tt">Проверка, что соединение с сервером работает</key>
 		<key name="menu.main.tools.settings">Настройки</key>
 		<key name="menu.main.tools.settings.tt">Настройки приложения</key>
+		<key name="menu.main.tools.models">Модели</key>		
+		<key name="menu.main.tools.models.tt">Доступные для работы модели</key>		
 		<key name="menu.main.tools.languages">Язык</key>
 		<key name="menu.main.tools.languages.tt">Выбрать язык интерфейса</key>
 		<key name="menu.main.help">Справка</key>
