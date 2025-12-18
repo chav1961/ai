@@ -3,7 +3,10 @@ package chav1961.ai.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -15,6 +18,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import chav1961.ai.api.json.request.GenerateRequest;
+import chav1961.ai.api.json.response.GenerateResponse;
 import chav1961.ai.api.json.response.ModelResponse;
 import chav1961.ai.api.json.response.ModelsResponse;
 import chav1961.ai.api.json.response.VersionInfo;
@@ -40,6 +45,7 @@ public class Application extends JRichFrame {
 	public static final File	FILE_SETTINGS = new File("./.ai.gui.properties"); 
 	public static final String	ARG_SERVER_URI = "serverUri";
 	public static final String	SETTINGS_CURRENT_MODEL = "currentModel";
+	public static final String	SETTINGS_DEFAULT_CURRENT_MODEL = "deepseek-r1:8b";
 	public static final String	LRU_PREFIX = "lru";
 	
 	public static final String	KEY_APPLICATION_TITLE = "chav1961.ai.gui.Application.title";
@@ -57,8 +63,8 @@ public class Application extends JRichFrame {
     private String 				currentModel = "???";
 
     public Application(final ContentMetadataInterface mdi, final ArgParser args, final SubstitutableProperties settings) throws NullPointerException {
-    	super(mdi, args, settings);
-        this.inputField = new JCommandLine(getLocalizer(), (c)->{});
+    	super(mdi, args, settings, true);
+        this.inputField = new JCommandLine(getLocalizer(), true, (c)->processCommand(c));
         this.outputArea.setEditable(false);
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
         		new JScrollPane(outputArea), 
@@ -69,7 +75,7 @@ public class Application extends JRichFrame {
         getContentPane().add(splitPane, BorderLayout.CENTER);
         try {
 			this.connector = new AIConnector(args.getValue(ARG_SERVER_URI, URI.class));
-			this.currentModel = settings.getProperty(SETTINGS_CURRENT_MODEL, String.class, "deepseek-r1:8b");
+			this.currentModel = settings.getProperty(SETTINGS_CURRENT_MODEL, String.class, SETTINGS_DEFAULT_CURRENT_MODEL);
 	        pingServer();
 		} catch (CommandLineParametersException | NullPointerException | IllegalStateException | IllegalArgumentException e) {
 			throw new IllegalArgumentException(e);
@@ -79,10 +85,30 @@ public class Application extends JRichFrame {
     @OnAction("action:/exit")
     @Override
 	protected void exitApplication() {
+   		try {
+			getSettings().store(FILE_SETTINGS);
+		} catch (IOException e) {
+		}
     	super.exitApplication();
 		System.exit(0);
 	}
 
+    private void processCommand(final String command) {
+    	final GenerateRequest rq = new GenerateRequest();
+    	
+    	rq.setModel(currentModel);
+    	rq.setPrompt(command);
+    	rq.setStream(false);
+    	
+		try {
+			final GenerateResponse	rs = connector.call(APIAction.GENERATE, rq, GenerateResponse.class);
+			
+			outputArea.append(rs.getResponse());
+		} catch (IOException e) {
+			getLogger().message(Severity.error, KEY_APPLICATION_MESSAGE_SERVER_FAILED, connector.getServerAddress(), e.getLocalizedMessage());
+		}
+    }
+    
     @OnAction("action:/ping")
     private void pingServer() {
     	try {
@@ -92,7 +118,7 @@ public class Application extends JRichFrame {
 			final List<String>		content = new ArrayList<>();
 			
 			for(ModelResponse model  : models.getModels()) {
-				content.add(model.getName());
+				content.add(model.getName()+';'+model.getName());
 			}
 			SwingUtils.fillRadioSubmenu(mwm, content, currentModel);
 			getLogger().message(Severity.info, KEY_APPLICATION_MESSAGE_SERVER_OK, connector.getServerAddress(), info.getVersion());
@@ -104,6 +130,7 @@ public class Application extends JRichFrame {
     @OnAction("action:/menu.main.tools.models")
     private void selectModel(final Hashtable<String,String[]> models) throws LocalizationException {
     	currentModel = models.get("name")[0];
+    	getSettings().setProperty(SETTINGS_CURRENT_MODEL, currentModel);
     }
     
     @OnAction("action:/about")
