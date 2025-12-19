@@ -98,8 +98,6 @@ public class Options implements FormManager<Object, Options>, ModuleAccessor, Cl
     @SerializedName("min_p")
     private Float min_p = 0.0f;
 
-	private LoggerFacade logger = null;
-	
     /**
      * Default constructor.
      */
@@ -204,10 +202,6 @@ public class Options implements FormManager<Object, Options>, ModuleAccessor, Cl
     	}
     }
 
-    public void setLogger(final LoggerFacade logger) {
-		this.logger = logger;
-	}
-
 	@Override
     public String toString() {
         return "Options [num_ctx=" + num_ctx + ", repeat_last_n=" + repeat_last_n + 
@@ -222,13 +216,8 @@ public class Options implements FormManager<Object, Options>, ModuleAccessor, Cl
     }
     
 	@Override
-	public RefreshMode onField(final Options inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
+	public RefreshMode onField(final LoggerFacade logger, final Options inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		return RefreshMode.DEFAULT;
-	}
-
-	@Override
-	public LoggerFacade getLogger() {
-		return logger;
 	}
 
 	@Override

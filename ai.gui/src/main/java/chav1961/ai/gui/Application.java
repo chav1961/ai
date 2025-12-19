@@ -113,7 +113,6 @@ public class Application extends JRichFrame {
     	try {
 			final Options temp = (Options) options.clone();
 			
-			temp.setLogger(getLogger());
 			if (ask(temp, getLocalizer(), 400, 280)) {
 				options.set(temp);
 			}
