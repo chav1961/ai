@@ -59,7 +59,7 @@
 	</distributionManagement>
 	
      <build>
-       <finalName>ai.client</finalName>
+       <finalName>ai.api</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -92,7 +92,6 @@
                        <manifest>
                            <addClasspath>true</addClasspath>
                            <classpathPrefix>./</classpathPrefix>
-                            <mainClass>chav1961.ai.client.Application</mainClass>
                        </manifest>
                    </archive>
                </configuration>

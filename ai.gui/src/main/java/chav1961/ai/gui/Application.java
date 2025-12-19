@@ -3,10 +3,7 @@ package chav1961.ai.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -18,6 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import chav1961.ai.api.json.Options;
 import chav1961.ai.api.json.request.GenerateRequest;
 import chav1961.ai.api.json.response.GenerateResponse;
 import chav1961.ai.api.json.response.ModelResponse;
@@ -26,12 +24,11 @@ import chav1961.ai.api.json.response.VersionInfo;
 import chav1961.ai.client.AIConnector;
 import chav1961.ai.client.interfaces.APIAction;
 import chav1961.purelib.basic.ArgParser;
-import chav1961.purelib.basic.PureLibSettings;
 import chav1961.purelib.basic.SubstitutableProperties;
 import chav1961.purelib.basic.exceptions.CommandLineParametersException;
+import chav1961.purelib.basic.exceptions.ContentException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
-import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
 import chav1961.purelib.ui.swing.SwingUtils;
@@ -51,6 +48,7 @@ public class Application extends JRichFrame {
 	public static final String	KEY_APPLICATION_TITLE = "chav1961.ai.gui.Application.title";
 	public static final String	KEY_APPLICATION_MESSAGE_SERVER_OK = "chav1961.ai.gui.Application.message.server.ok";
 	public static final String	KEY_APPLICATION_MESSAGE_SERVER_FAILED = "chav1961.ai.gui.Application.message.server.failed";
+	public static final String	KEY_APPLICATION_MESSAGE_ERROR_DETECTED = "chav1961.ai.gui.Application.message.error.detected";
 	public static final String	KEY_APPLICATION_HELP_TITLE = "chav1961.ai.gui.Application.help.title";
 	public static final String	KEY_APPLICATION_HELP_CONTENT = "chav1961.ai.gui.Application.help.content";
 
@@ -60,6 +58,7 @@ public class Application extends JRichFrame {
     private final JTextArea 	outputArea = new JTextArea();
     private final JCommandLine 	inputField;
     private final AIConnector 	connector;
+    private final Options		options = new Options();
     private String 				currentModel = "???";
 
     public Application(final ContentMetadataInterface mdi, final ArgParser args, final SubstitutableProperties settings) throws NullPointerException {
@@ -106,6 +105,20 @@ public class Application extends JRichFrame {
 			outputArea.append(rs.getResponse());
 		} catch (IOException e) {
 			getLogger().message(Severity.error, KEY_APPLICATION_MESSAGE_SERVER_FAILED, connector.getServerAddress(), e.getLocalizedMessage());
+		}
+    }
+
+    @OnAction("action:/settings")
+    private void showOptions() {
+    	try {
+			final Options temp = (Options) options.clone();
+			
+			temp.setLogger(getLogger());
+			if (ask(temp, getLocalizer(), 400, 280)) {
+				options.set(temp);
+			}
+		} catch (CloneNotSupportedException | ContentException e) {
+			getLogger().message(Severity.error, e, KEY_APPLICATION_MESSAGE_ERROR_DETECTED, e.getLocalizedMessage());
 		}
     }
     

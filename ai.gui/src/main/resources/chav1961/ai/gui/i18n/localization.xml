@@ -5,6 +5,7 @@
 		<key name="chav1961.ai.gui.Application.title">(c) 2025, A.V.Chernomyrdin. AI client</key>
 		<key name="chav1961.ai.gui.Application.message.server.ok">AI server at %1$s is available, version is %2$s</key>
 		<key name="chav1961.ai.gui.Application.message.server.failed">AI server at %1$s failed (%2$s)</key>
+		<key name="chav1961.ai.gui.Application.message.error.detected">Error during processing: (%1$s)</key>
 		
 		<key name="chav1961.creolenotepad.Application.message.ready">Ready</key>
 		<key name="chav1961.creolenotepad.Application.message.notfound">Not found</key>		
@@ -104,6 +105,32 @@
 		<key name="menu.main.help.tt">Help system</key>
 		<key name="menu.main.help.about">About...</key>
 		<key name="menu.main.help.about.tt">Info about the application</key>
+
+<!-- Options class localization-->
+		<key name="options.title">Options</key>
+		<key name="options.title.tt">API request options</key>
+		<key name="options.title.help">API request options</key>
+		<key name="options.num_ctx">Context window size</key>
+		<key name="options.num_ctx.tt">Sets the size of the context window used to generate the next token. (Default: 2048)</key>
+		<key name="options.repeat_last_n">Last repetition size</key>
+		<key name="options.repeat_last_n.tt">Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)</key>
+		<key name="options.repeat_penalty">Last repetition penalty</key>
+		<key name="options.repeat_penalty.tt">Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient. (Default: 1.1)</key>
+		<key name="options.temperature">Temperature</key>
+		<key name="options.temperature.tt">The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)</key>
+		<key name="options.seed">Random seed to generate</key>
+		<key name="options.seed.tt">Sets the random number seed to use for generation. Setting this to a specific number will make the model generate the same text for the same prompt. (Default: 0)</key>
+		<key name="options.stop">Stop sequence for inferencing</key>
+		<key name="options.stop.tt">Sets the stop sequences to use. When this pattern is encountered the LLM will stop generating text and return. Multiple stop patterns may be set by specifying multiple separate stop parameters in a modelfile.</key>
+		<key name="options.num_predict">Number of predicted tokens</key>
+		<key name="options.num_predict.tt">Maximum number of tokens to predict when generating text. (Default: -1, infinite generation)</key>
+		<key name="options.top_k">Diverse top K</key>
+		<key name="options.top_k.tt">Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)</key>
+		<key name="options.top_p">Diverse top P</key>
+		<key name="options.top_p.tt">Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)</key>
+		<key name="options.min_p">Diverse balance</key>
+		<key name="options.min_p.tt">Alternative to the top-p, and aims to ensure a balance of quality and variety. The parameter _p represents the minimum probability for a token to be considered, relative to the probability of the most likely token. For example, with p=0.05 and the most likely token having a probability of 0.9, logits with a value less than 0.045 are filtered out. (Default: 0.0)</key>
+
 
 <!-- CreoleTab class localization-->
 		<key name="chav1961.creolenotepad.CreoleTab.save.title">Save file</key>
@@ -210,6 +237,7 @@
 		<key name="chav1961.ai.gui.Application.title">(c) 2025, A.V.Chernomyrdin. AI client</key>
 		<key name="chav1961.ai.gui.Application.message.server.ok">ИИ сервер по адресу %1$s доступен, версия=%2$s</key>
 		<key name="chav1961.ai.gui.Application.message.server.failed">ИИ сервер по адресу %1$s недоступен (%2$s)</key>
+		<key name="chav1961.ai.gui.Application.message.error.detected">Ошибка при обработке: (%1$s)</key>
 		
 		<key name="chav1961.creolenotepad.Application.message.ready">Готово</key>
 		<key name="chav1961.creolenotepad.Application.message.notfound">Не найдено</key>
@@ -301,6 +329,31 @@
 		<key name="menu.main.help.tt">Справочная система</key>
 		<key name="menu.main.help.about">О программе</key>
 		<key name="menu.main.help.about.tt">Информация о приложении</key>
+
+<!-- Локализация класса Options -->
+		<key name="options.title">Параметры</key>
+		<key name="options.title.tt">Параметры запроса API</key>
+		<key name="options.title.help">zzz</key>
+		<key name="options.num_ctx">Размер окна контекста</key>
+		<key name="options.num_ctx.tt">Задает размер окна контекста, используемого для генерации следующего токена. (По умолчанию: 2048)</key>
+		<key name="options.repeat_last_n">Размер последующего повторения</key>
+		<key name="options.repeat_last_n.tt">Определяет, насколько далеко назад модель заглядывает, чтобы предотвратить повторения. (По умолчанию: 64, 0 — отключено, -1 — равен num_ctx)</key>
+		<key name="options.repeat_penalty">Штраф за повторение</key>
+		<key name="options.repeat_penalty.tt">Задает, насколько сильно штрафовать повторения. Более высокое значение (например, 1.5) сильнее штрафует повторения, а меньшее (например, 0.9) – более снисходительно. (По умолчанию: 1.1)</key>
+		<key name="options.temperature">Температура</key>
+		<key name="options.temperature.tt">Температура модели. Повышение температуры сделает ответы более креативными. (По умолчанию: 0.8)</key>
+		<key name="options.seed">Начальное значение для генерации</key>
+		<key name="options.seed.tt">Задает начальное значение генератора случайных чисел. Установка конкретного числа обеспечит одинаковый текст для одного и того же запроса. (По умолчанию: 0)</key>
+		<key name="options.stop">Секвенции остановки для вывода</key>
+		<key name="options.stop.tt">Задает последовательности, при встрече с которыми модель прекращает генерацию текста и возвращает результат. Можно задать несколько паттернов остановки, указав их в настройках файла модели.</key>
+		<key name="options.num_predict">Максимальное количество предсказанных токенов</key>
+		<key name="options.num_predict.tt">Максимальное число токенов для предсказания при генерации текста. (По умолчанию: -1, бесконечная генерация)</key>
+		<key name="options.top_k">Разнообразие Top K</key>
+		<key name="options.top_k.tt">Уменьшает вероятность появления бессмысленных токенов. Более высокое значение (например, 100) даст более разнообразные ответы, а более низкое (например, 10) — более консервативные. (По умолчанию: 40)</key>
+		<key name="options.top_p">Разнообразие Top P</key>
+		<key name="options.top_p.tt">Работает вместе с top-k. Более высокое значение (например, 0.95) обеспечивает более разнообразный текст, а более низкое (например, 0.5) — более сфокусированный и консервативный. (По умолчанию: 0.9)</key>
+		<key name="options.min_p">Баланс разнообразия</key>
+		<key name="options.min_p.tt">Альтернатива параметру top-p, направленная на баланс качества и разнообразия. _p — минимальная вероятность токена для его включения, относительно самой вероятной. Например, при p=0.05 и вероятности самой вероятной токена 0.9, логиты с значением менее 0.045 отфильтровываются. (По умолчанию: 0.0)</key>
 
 <!-- Локализация класса CreoleTab -->
 		<key name="chav1961.creolenotepad.CreoleTab.save.title">Сохранить файл</key>
