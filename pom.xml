@@ -29,5 +29,6 @@
   	<module>ai.api</module>
   	<module>ai.client</module>
   	<module>ai.gui</module>
+  	<module>ai.voice</module>
   </modules>
 </project>
