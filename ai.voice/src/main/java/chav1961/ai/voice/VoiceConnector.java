@@ -17,9 +17,16 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import com.google.gson.Gson;
 
@@ -78,7 +85,11 @@ public class VoiceConnector {
     	}
     	else {
     		if (System.currentTimeMillis() > expiration) {
-    			expiration = queryAccessToken();
+    			try {
+					expiration = queryAccessToken();
+				} catch (KeyManagementException | NoSuchAlgorithmException e) {
+					throw new IOException(e);
+				}
     		}
         	final URL	server = URI.create(serverUri.toString()+RECOGNIZE_PATH).toURL(); 
             final HttpURLConnection connection = (HttpURLConnection) server.openConnection(Proxy.NO_PROXY);
@@ -118,7 +129,33 @@ public class VoiceConnector {
     	return null;
     }
 
-    private long queryAccessToken() throws IOException {
+    private long queryAccessToken() throws IOException, NoSuchAlgorithmException, KeyManagementException {
+    	TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        // Не выполняем проверку клиентских сертификатов
+                    }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        // Не выполняем проверку серверных сертификатов
+                    }
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                }
+            };
+
+            // Инициализируем SSLContext с нашим TrustManager
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new SecureRandom());
+
+            // Устанавливаем созданный SSLContext по умолчанию для HTTPS-соединений
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    	
+    	
+    	
     	final HttpClient	cli = HttpClient.newHttpClient();
     	final URI			server = URI.create("https://ngw.devices.sberbank.ru:9443/api/v2/oauth"); 
         final UUID			connId = UUID.randomUUID();
