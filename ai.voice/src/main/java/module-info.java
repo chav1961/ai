@@ -9,4 +9,6 @@ module chav1961.ai.voice {
 	requires java.net.http;
 	
 	exports chav1961.ai.voice;
+	exports chav1961.ai.voice.interfaces;
+	opens chav1961.ai.voice.json.response to com.google.gson;
 }

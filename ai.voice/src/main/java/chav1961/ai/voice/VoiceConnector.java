@@ -1,35 +1,29 @@
 package chav1961.ai.voice;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandler;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import com.google.gson.Gson;
 
+import chav1961.ai.voice.interfaces.VoiceConnectorInterface;
 import chav1961.ai.voice.json.response.OAuthResponse;
 import chav1961.ai.voice.json.response.RecognizeResponse;
 import chav1961.purelib.basic.Utils;
@@ -38,31 +32,47 @@ import chav1961.purelib.basic.Utils;
 // Client ID: 019bbad9-ac46-7822-943c-f9836c81cb81
 // Scope: SALUTE_SPEECH_PERS
 // Key: MDE5YmJhZDktYWM0Ni03ODIyLTk0M2MtZjk4MzZjODFjYjgxOjg1YWEyMWM0LTA4YTItNGE0MS1iYjhlLTMzMDNlZTNlNDdlMA==
-public class VoiceConnector {
-	private static final Gson 			GSON = new Gson();
-	private static final String 		ENCODING = "UTF-8";
-	private static final String			OAUTH_PATH = "/api/v2/oauth";
-	private static final String			RECOGNIZE_PATH = "/rest/v1/speech:recognize";	
+public class VoiceConnector implements VoiceConnectorInterface {
+	private static final Gson 		GSON = new Gson();
+	private static final String 	ENCODING = "UTF-8";
+	private static final String		OAUTH_PATH = "/api/v2/oauth";
+	private static final String		RECOGNIZE_PATH = "/rest/v1/speech:recognize";	
+	private static final String		SYNTHESIZE_PATH = "/rest/v1/text:synthesize";
+	private static final URI		DEBUG_OAUTH_URI = URI.create("https://ngw.devices.sberbank.ru:9443");
+	private static final URI		DEBUG_RECORNIZE_URI = URI.create("https://smartspeech.sber.ru");
+	private static final String		DEBUG_PERSONAL_TOKEN = "MDE5YmJhZDktYWM0Ni03ODIyLTk0M2MtZjk4MzZjODFjYjgxOjg1YWEyMWM0LTA4YTItNGE0MS1iYjhlLTMzMDNlZTNlNDdlMA==";
 	
     private final URI 		serverOAuthUri;
     private final URI 		serverUri;
     private final String	token;
+    private final Proxy		proxy;
     private String			accessToken;
     private long 			expiration = 0; 
 
+    /**
+     * <p>Constructor of the debug instance</p>
+     */
     public VoiceConnector() throws NullPointerException {
-    	this(URI.create("https://ngw.devices.sberbank.ru:9443"),
-    		 URI.create("https://smartspeech.sber.ru"),
-    		 "MDE5YmJhZDktYWM0Ni03ODIyLTk0M2MtZjk4MzZjODFjYjgxOjg1YWEyMWM0LTA4YTItNGE0MS1iYjhlLTMzMDNlZTNlNDdlMA==");
+    	this(Proxy.NO_PROXY);
+    }    
+
+    /**
+     * <p>Constructor of the debug instance</p>
+     * @param proxy proxy to use. Can't be null
+     */
+    public VoiceConnector(final Proxy proxy) throws NullPointerException {
+    	this(DEBUG_OAUTH_URI, DEBUG_RECORNIZE_URI, DEBUG_PERSONAL_TOKEN, proxy);
     }    
     
     /**
-     * Конструктор принимает URL сервера.
-     *
-     * @param urlString строка URL сервера
-     * @throws IOException если URL некорректен
+     * <p>Constructor of the class instance</p>
+     * @param oAuthUri uri to make OAuth. Can't be null 
+     * @param uri uri to recognize/speech. Can't be null
+     * @param token Identification token to use. Can't be null
+     * @param proxy proxy to use. Can't be null
+     * @throws NullPointerException
      */
-    public VoiceConnector(final URI oAuthUri, final URI uri, final String token) throws NullPointerException {
+    public VoiceConnector(final URI oAuthUri, final URI uri, final String token, final Proxy proxy) throws NullPointerException {
     	if (oAuthUri == null) {
     		throw new NullPointerException("Server oAuth URI can't be null");
     	}
@@ -72,13 +82,23 @@ public class VoiceConnector {
     	else if (Utils.checkEmptyOrNullString(token)) {
     		throw new IllegalArgumentException("TOken string can be neither null nor empty");
     	}
+    	else if (proxy == null) {
+    		throw new NullPointerException("Proxy descrptor can't be null");
+    	}
     	else {
             this.serverUri = uri;
             this.serverOAuthUri = oAuthUri;
             this.token = token;
+            this.proxy = proxy;
     	}
     }
     
+    /**
+     * <p>Recognize content and return it's string representation</p>
+     * @param audioSource content to recognize. Can't be null and must have "audio/x-pcm;bit=16;rate=16000" format (*.wav file)
+     * @return recognized string. Can't be null but can be empty
+     * @throws IOException on any I/O errors
+     */
     public String recognize(final InputStream audioSource) throws IOException {
     	if (audioSource == null) {
     		throw new NullPointerException("Audio source can't be null");
@@ -92,9 +112,8 @@ public class VoiceConnector {
 				}
     		}
         	final URL	server = URI.create(serverUri.toString()+RECOGNIZE_PATH).toURL(); 
-            final HttpURLConnection connection = (HttpURLConnection) server.openConnection(Proxy.NO_PROXY);
+            final HttpURLConnection connection = (HttpURLConnection) server.openConnection(proxy);
             
-            connection.setDoInput(true);
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "audio/x-pcm;bit=16;rate=16000");
@@ -124,59 +143,88 @@ public class VoiceConnector {
     	}
     }
     
-	public OutputStream vocalize(final CharSequence source) throws IOException { 
-    	// TODO:
-    	return null;
+	public InputStream vocalize(final CharSequence source) throws IOException { 
+    	if (Utils.checkEmptyOrNullString(source)) {
+    		throw new IllegalArgumentException("Source string can  be neither null nor empty");
+    	}
+    	else {
+    		if (System.currentTimeMillis() > expiration) {
+    			try {
+					expiration = queryAccessToken();
+				} catch (KeyManagementException | NoSuchAlgorithmException e) {
+					throw new IOException(e);
+				}
+    		}
+        	final URL	server = URI.create(serverUri.toString()+SYNTHESIZE_PATH).toURL(); 
+            final HttpURLConnection connection = (HttpURLConnection) server.openConnection(proxy);
+            
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/text");
+            connection.setRequestProperty("Accept", "audio/x-wav");
+            connection.setRequestProperty("Authorization", "Bearer "+accessToken);
+
+            try(final OutputStream 	os = connection.getOutputStream();
+            	final Writer		wr = new OutputStreamWriter(os)) {
+            	
+            	Utils.copyStream(new StringReader(new StringBuilder(source).toString()), wr);
+            }
+            final int responseCode = connection.getResponseCode();
+            
+            if (responseCode >= 200 && responseCode < 300) {
+                try(final InputStream 	is = connection.getInputStream();
+                	final ByteArrayOutputStream	baos = new ByteArrayOutputStream()){
+                	
+                	Utils.copyStream(is, baos);
+    				
+    				return new ByteArrayInputStream(baos.toByteArray());
+    			}
+            }
+            else {
+                try(final InputStream is = connection.getErrorStream();
+    				final Reader rdr = new InputStreamReader(is, ENCODING)){
+                	
+    			    throw new IOException(Utils.fromResource(rdr));
+    			}
+            }
+    	}
     }
 
     private long queryAccessToken() throws IOException, NoSuchAlgorithmException, KeyManagementException {
-    	TrustManager[] trustAllCerts = new TrustManager[] {
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                        // Не выполняем проверку клиентских сертификатов
-                    }
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                        // Не выполняем проверку серверных сертификатов
-                    }
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                }
-            };
-
-            // Инициализируем SSLContext с нашим TrustManager
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new SecureRandom());
-
-            // Устанавливаем созданный SSLContext по умолчанию для HTTPS-соединений
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-    	
-    	
-    	
-    	final HttpClient	cli = HttpClient.newHttpClient();
-    	final URI			server = URI.create("https://ngw.devices.sberbank.ru:9443/api/v2/oauth"); 
         final UUID			connId = UUID.randomUUID();
         final String		body = "scope=SALUTE_SPEECH_PERS"; 
-    	final HttpRequest	rq = HttpRequest.newBuilder()
-    								.uri(server)
-    								.header("Content-Type", "application/x-www-form-urlencoded")
-    								.header("Accept", "application/json")
-    								.header("RqUID", ""+connId)
-    								.header("Authorization", "Basic "+token)
-    								.POST(BodyPublishers.ofString(body))
-    								.build();
-    	HttpResponse<String> resp;
-		try {
-			resp = cli.send(rq, BodyHandlers.ofString());
-			
-	    	System.err.println("Content="+resp.body());
-	    	return 0;
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		}
+    	final URL			server = URI.create(serverOAuthUri.toString()+OAUTH_PATH).toURL(); 
+        final HttpsURLConnection connection = (HttpsURLConnection) server.openConnection(proxy);
+        
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setRequestProperty("RqUID", ""+connId);
+        connection.setRequestProperty("Authorization", "Basic "+token);
 
+        try(final OutputStream 	os = connection.getOutputStream();
+        	final Writer		wr = new OutputStreamWriter(os, ENCODING)) {
+        	
+        	Utils.copyStream(new StringReader(body), wr);
+        }
+        final int responseCode = connection.getResponseCode();
+        
+        if (responseCode >= 200 && responseCode < 300) {
+            try(final InputStream 	is = connection.getInputStream();
+				final Reader 		rdr = new InputStreamReader(is, ENCODING)){
+				final OAuthResponse	resp = GSON.fromJson(rdr, OAuthResponse.class);
+				
+				this.accessToken = resp.access_token; 
+				return resp.expires_at;
+			}
+        }
+        else {
+            try(final InputStream is = connection.getErrorStream();
+				final Reader rdr = new InputStreamReader(is, ENCODING)){
+            	
+			    throw new IOException(Utils.fromResource(rdr));
+			}
+        }
 	}
 }
